@@ -7,14 +7,16 @@
   "scripts": {
     "build": "tsc",
     "start": "node build/index.js",
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
+    "dev": "NODE_ENV=development tsx --watch index.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@types/node": "^20.12.12",
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "winston": "^3.13.0",
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.2.0",
@@ -24,6 +26,7 @@
     "eslint": "^9.2.0",
     "globals": "^15.2.0",
     "prisma": "^5.14.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.5",
     "typescript-eslint": "^7.9.0"
   }
