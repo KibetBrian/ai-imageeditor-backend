@@ -1,5 +1,14 @@
-function printName(name: string) {
-  console.log(name);
-}
+import express, { Response } from 'express';
 
-printName("Brian");
+const app = express();
+
+const port = 8080;
+
+app.get('/', (_, res: Response) => {
+  res.send('Hello World');
+});
+
+app.listen(port, () => {
+  // eslint-disable-next-line no-console
+  console.log(`Server is running on port ${  port}`);
+});
