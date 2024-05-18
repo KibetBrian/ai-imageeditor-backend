@@ -2,12 +2,7 @@ import express, { Response } from 'express';
 import cors from 'cors';
 import hpp from 'hpp';
 import { StatusCodes } from 'http-status-codes';
-import dotenv from 'dotenv';
 import { envVariablesChecker } from './utils/env';
-
-dotenv.config({
-  path: './.env'
-});
 
 const app = express();
 
