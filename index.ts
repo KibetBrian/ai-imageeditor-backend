@@ -35,6 +35,8 @@ app.get('/health', (req, res: Response) => {
 app.use(errorMiddleware);
 
 app.listen(port, () => {
+  // eslint-disable-next-line no-console
+  console.clear();
   // Pre checks
   envVariablesChecker();
 
