@@ -25,7 +25,7 @@ app.use(hpp());
   return Number(this);
 };
 
-const port = process.env.PORT;
+const port = process.env.APPLICATION_PORT;
 
 app.get('/health', (req, res: Response) => {
   res.status(StatusCodes.OK).send('OK');
