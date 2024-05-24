@@ -3,6 +3,7 @@ import cors from 'cors';
 import hpp from 'hpp';
 import { StatusCodes } from 'http-status-codes';
 import { envVariablesChecker } from './utils/env';
+import { errorMiddleware } from './middleware/error';
 
 const app = express();
 
@@ -30,6 +31,8 @@ const port = process.env.APPLICATION_PORT;
 app.get('/health', (req, res: Response) => {
   res.status(StatusCodes.OK).send('OK');
 });
+
+app.use(errorMiddleware);
 
 app.listen(port, () => {
   // Pre checks
