@@ -13,9 +13,9 @@ export interface ErrorPayload {
 // eslint-disable-next-line max-params
 export const errorMiddleware = (error: ErrorPayload, req: Request, res: Response, next: NextFunction) => {
   logger.error(error);
-    
+
   res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-    error: error.message
+    message: "Internal server error"
   });
 
   next();
