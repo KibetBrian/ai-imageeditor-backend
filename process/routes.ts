@@ -7,7 +7,7 @@ import { StatusCodes } from "http-status-codes";
 import path from 'path';
 
 // eslint-disable-next-line no-magic-numbers
-const MAX_FILE_SIZE = 1024 * 1024 * 5; // 5MB
+const MAX_FILE_SIZE = 1024 * 1024 * 10; // 10MB
 
 const fileFilter = (req: Request, file:Express.Multer.File, cb: FileFilterCallback) => {
   const allowedTypes = /jpeg|jpg|png|webp/;
