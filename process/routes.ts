@@ -1,25 +1,53 @@
-import { Router } from "express";
+import { NextFunction, Router, Request, Response } from "express"; // Added Response here
 import { generate } from "./generate";
 import { removeBackground } from "./background_remover/backgroundRemover";
-import multer from 'multer';
+import multer, { FileFilterCallback, MulterError } from 'multer'; // Imported File and added it to the imports
+import { removeObject } from "./object_removal/object_removal";
+import { StatusCodes } from "http-status-codes";
+import path from 'path';
 
-const validTypes = ["image/jpeg", "image/png", "image/webp"];
+// eslint-disable-next-line no-magic-numbers
+const MAX_FILE_SIZE = 1024 * 1024 * 5; // 5MB
+
+const fileFilter = (req: Request, file:Express.Multer.File, cb: FileFilterCallback) => {
+  const allowedTypes = /jpeg|jpg|png|webp/;
+
+  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+  
+  const mimetype = allowedTypes.test(file.mimetype);
+
+  if (extname && mimetype) {
+    cb(null, true);
+  } else {
+    cb(new Error('Invalid file type. Only JPEG, PNG, and WEBP files are allowed.'));
+  }
+};
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  fileFilter(req, file, callback) {
-    if (!validTypes.includes(file.mimetype)){
-      callback(null, false);
+  limits: { fileSize: MAX_FILE_SIZE },
+  fileFilter
+}).array('files');
+
+const fileUploadMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  upload(req, res, (err: any) => {
+    if (err instanceof MulterError) {
+  
+      return res.status(StatusCodes.BAD_REQUEST).json({ error: err.message });
+    } else if (err) {
+
+      return res.status(StatusCodes.BAD_REQUEST).json({ error: err.message });
     }
-
-    callback(null, true);
-  }
-
-});
+    
+    next();
+  });
+};
 
 const processRouter = Router();
 
 processRouter.post("/generate", generate);
-processRouter.post('/process/background-removal', upload.array('files'),  removeBackground);
+processRouter.post('/process/background-removal', fileUploadMiddleware, removeBackground);
+processRouter.post('/process/object-removal', fileUploadMiddleware, removeObject);
 
 export default processRouter;
