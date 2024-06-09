@@ -4,9 +4,10 @@ import hpp from 'hpp';
 import { StatusCodes } from 'http-status-codes';
 import { envVariablesChecker } from './utils/env';
 import { errorMiddleware } from './middleware/error';
-import generateRouter from './generate/routes';
-
+import processRouter from './process/routes';
 const app = express();
+
+app.use(express.urlencoded({ extended: true }));
 
 app.use(express.json());
 
@@ -35,7 +36,7 @@ app.get('/health', (req, res: Response) => {
 
 app.use(errorMiddleware);
 
-app.use(generateRouter);
+app.use(processRouter);
 
 app.listen(port, () => {
   // eslint-disable-next-line no-console

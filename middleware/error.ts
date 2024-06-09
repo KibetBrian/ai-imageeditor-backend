@@ -2,6 +2,7 @@
 
 import { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
+import multer from "multer";
 import logger from "../utils/logger";
 
 export interface ErrorPayload {
@@ -14,9 +15,16 @@ export interface ErrorPayload {
 export const errorMiddleware = (error: ErrorPayload, req: Request, res: Response, next: NextFunction) => {
   logger.error(error);
 
-  res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-    message: "Internal server error"
-  });
+  if (error.error instanceof multer.MulterError){
+    res.status(StatusCodes.BAD_REQUEST).json({
+      message: 'Invalid file'
+    });
+  } else {
+    
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Internal server error"
+    });
+  }
 
   next();
 };
