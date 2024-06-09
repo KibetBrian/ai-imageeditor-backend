@@ -6,9 +6,12 @@ import FormData from "form-data";
 import logger from '../../utils/logger';
 import { makeBlackAndWhite } from './utils';
 import { ObjectRemovalApiResponseHeaders } from './types';
+import {incrementSdRemainingRequests } from '../../caching/redis';
 
 export const removeObject = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    await incrementSdRemainingRequests();
+
     const outputFormat ='png';
     const files = req.files as Express.Multer.File[];
 

@@ -5,6 +5,7 @@ import { StatusCodes } from 'http-status-codes';
 import { envVariablesChecker } from './utils/env';
 import { errorMiddleware } from './middleware/error';
 import processRouter from './process/routes';
+import { redisClient } from './caching/redis';
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
@@ -38,11 +39,15 @@ app.use(errorMiddleware);
 
 app.use(processRouter);
 
-app.listen(port, () => {
+app.listen(port,  async() => {
   // eslint-disable-next-line no-console
   console.clear();
   // Pre checks
   envVariablesChecker();
+
+  await redisClient.connect();
+  // eslint-disable-next-line no-console
+  console.log('Connected to Redis');
 
   // eslint-disable-next-line no-console
   console.log(`Server is running on port ${port}`);

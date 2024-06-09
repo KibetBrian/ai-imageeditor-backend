@@ -3,7 +3,8 @@ import { z } from 'zod';
 const envVariableSchema = z.object({
   DATABASE_URL: z.string().url().min(1, { message: "DATABASE_URL cannot be empty" }),
   APPLICATION_PORT: z.string().min(1, { message: "PORT cannot be empty" }),
-  STABILITY_AI_API_KEY: z.string().min(1, { message: "STABILITY_AI_API_KEY cannot be empty" })
+  STABILITY_AI_API_KEY: z.string().min(1, { message: "STABILITY_AI_API_KEY cannot be empty" }),
+  REDIS_URL: z.string().url().min(1, { message: "REDIS_URL cannot be empty" })
 });
 
 declare global {
