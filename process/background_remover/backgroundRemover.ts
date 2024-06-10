@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { handleError } from "../../utils/utils";
 import { StatusCodes } from "http-status-codes";
+import { incrementSdRemainingRequests } from "../../caching/redis";
 
 export const removeBackground = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -8,6 +9,13 @@ export const removeBackground = async (req: Request, res: Response, next: NextFu
     if (!files || files.length === 0) {
       return res.status(StatusCodes.BAD_REQUEST).json({ message: 'No files uploaded' });
     }
+
+    const rateLimitingPromise=[];
+    for (let i=0; i<files.length; i++){
+      rateLimitingPromise.push( incrementSdRemainingRequests());
+    }
+    
+    await Promise.all(rateLimitingPromise);
 
     // Simulate file processing
     // eslint-disable-next-line no-magic-numbers

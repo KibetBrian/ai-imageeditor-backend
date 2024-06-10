@@ -21,11 +21,9 @@ export const incrementSdRemainingRequests = async (): Promise<void> => {
   const requests = await redisClient.incr(key);
 
   if (requests >=stableDiffusionRateLimit){
+    await new Promise((resolve) => setTimeout(resolve, tenSecondsInMilliseconds));
     await redisClient.set(key, 0);
     await redisClient.expire(key, tenSeconds);
-    
-    // Sleep for ten seconds
-    await new Promise((resolve) => setTimeout(resolve, tenSecondsInMilliseconds));
   }
 };
 

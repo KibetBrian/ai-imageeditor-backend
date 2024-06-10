@@ -53,7 +53,8 @@ export const removeObject = async (req: Request, res: Response, next: NextFuncti
 
     const responseHeaders = response.headers as unknown as ObjectRemovalApiResponseHeaders;
 
-    const base64Image = response.data;
+    // TODO: change to correct
+    const base64Image = blackAndWhiteMask.toString('base64');
 
     if (responseHeaders['finish-reason'] === 'CONTENT_FILTERED') {
       return res.status(StatusCodes.BAD_REQUEST).json({message: 'Your request was flagged by content moderation system'});
