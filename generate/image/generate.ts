@@ -43,6 +43,12 @@ export const generate = async (req: Request, res: Response, next: NextFunction) 
       }
     );
 
+    if (response.status===StatusCodes.UNAUTHORIZED){
+      logger.error({ message: 'Unauthorized request', response: response.data });
+      
+      return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'We are experiencing some issues. Please try again later' });
+    }
+
     if (response.status === StatusCodes.OK) {
       res.setHeader('Content-Type', `image/${outputFormat}`);
       res.status(StatusCodes.OK).json({ message: 'Image generated', image: response.data });

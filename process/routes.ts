@@ -5,6 +5,7 @@ import multer, { FileFilterCallback, MulterError } from 'multer'; // Imported Fi
 import { removeObject } from "./object_removal/object_removal";
 import { StatusCodes } from "http-status-codes";
 import path from 'path';
+import { verifyToken } from "../middleware/auth";
 
 // eslint-disable-next-line no-magic-numbers
 const MAX_FILE_SIZE = 1024 * 1024 * 10; // 10MB
@@ -47,7 +48,7 @@ const fileUploadMiddleware = (req: Request, res: Response, next: NextFunction) =
 const processRouter = Router();
 
 processRouter.post("/generate", generate);
-processRouter.post('/process/background-removal', fileUploadMiddleware, removeBackground);
+processRouter.post('/process/background-removal', verifyToken, fileUploadMiddleware, removeBackground);
 processRouter.post('/process/object-removal', fileUploadMiddleware, removeObject);
 
 export default processRouter;

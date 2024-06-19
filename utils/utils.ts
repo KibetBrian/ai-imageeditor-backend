@@ -1,5 +1,6 @@
 import { NextFunction } from "express";
 import { ErrorPayload } from "../middleware/error";
+import {createId} from '@paralleldrive/cuid2';
 
 interface HandleError extends ErrorPayload {
   next: NextFunction;
@@ -11,4 +12,8 @@ export const handleError = (input: HandleError) => {
   const { next, message, error, functionName } = input;
 
   next({ message, error, functionName });
+};
+
+export const generateCuid = () => {
+  return createId();
 };

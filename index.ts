@@ -6,6 +6,10 @@ import { envVariablesChecker } from './utils/env';
 import { errorMiddleware } from './middleware/error';
 import processRouter from './process/routes';
 import { redisClient } from './caching/redis';
+import generateRouter from './generate/routes';
+import cookieParser from 'cookie-parser';
+import authRouter from './auth/routes';
+
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
@@ -20,8 +24,11 @@ const corsOptions = {
   optionsSuccessStatus: 200
 };
 
+app.use(authRouter);
+
 app.use(cors(corsOptions));
 app.use(hpp());
+app.use(cookieParser());
 
 // Allow prisma to serialize bigint
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,8 +43,8 @@ app.get('/health', (req, res: Response) => {
 });
 
 app.use(errorMiddleware);
-
 app.use(processRouter);
+app.use(generateRouter);
 
 app.listen(port,  async() => {
   // eslint-disable-next-line no-console

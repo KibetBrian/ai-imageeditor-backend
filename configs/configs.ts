@@ -1,12 +1,12 @@
-export const configs ={
+export const thirdPartyApiConfigs = {
   stableDiffusion: {
     baseUrl: 'https://api.stability.ai/v2beta/stable-image/generate',
-    models:[
+    models: [
       {
         name: 'ultra',
         endpoint: 'https://api.stability.ai/v2beta/stable-image/generate/ultra'
       },
-      {   
+      {
         name: 'core',
         endpoint: 'https://api.stability.ai/v2beta/stable-image/generate/core'
       },
@@ -14,6 +14,11 @@ export const configs ={
         name: 'sd3',
         endpoint: 'https://api.stability.ai/v2beta/stable-image/generate/sd3'
       }
-    ]
+    ],
+    backgroundRemoval: {
+      endpoint: 'https://api.stability.ai/v2beta/stable-image/edit/remove-background',
+      credits: 2
+
+    }
   }
 };
