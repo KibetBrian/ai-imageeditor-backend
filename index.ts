@@ -5,10 +5,12 @@ import { StatusCodes } from 'http-status-codes';
 import { envVariablesChecker } from './utils/env';
 import { errorMiddleware } from './middleware/error';
 import processRouter from './process/routes';
-import { redisClient } from './caching/redis';
+import { redisClient } from './state/redis';
 import generateRouter from './generate/routes';
 import cookieParser from 'cookie-parser';
 import authRouter from './auth/routes';
+import { consumeFromAllQueues } from './messaging/rabbitmq';
+import logger from './utils/logger';
 
 const app = express();
 
@@ -46,13 +48,24 @@ app.use(errorMiddleware);
 app.use(processRouter);
 app.use(generateRouter);
 
-app.listen(port,  async() => {
+app.listen(port, async () => {
   // eslint-disable-next-line no-console
   console.clear();
   // Pre checks
   envVariablesChecker();
 
-  await redisClient.connect();
+  try {
+    await Promise.all([
+      redisClient.connect(),
+      consumeFromAllQueues()
+    ]);
+  } catch (e){
+    logger.error({
+      messages: 'Error consuming message from queue',
+      functionName: 'consumeFromAllQueues',
+      error: e
+    });
+  }
   // eslint-disable-next-line no-console
   console.log('Connected to Redis');
 

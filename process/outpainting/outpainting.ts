@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { handleError } from "../../utils/utils";
 import { StatusCodes } from 'http-status-codes';
-import { incrementSdRemainingRequests } from '../../caching/redis';
+import { incrementSdRemainingRequests } from '../../state/redis';
 import axios from "axios";
 import FormData from "form-data";
 import { outpaintingValidationSchema } from './validations';
@@ -16,7 +16,7 @@ export const outpaint = async (req: Request, res: Response, next: NextFunction) 
       return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid request' });
     }
 
-    const {down, left, outputFormat, right, up} = validationResults.data;
+    const { down, left, outputFormat, right, up } = validationResults.data;
 
     await incrementSdRemainingRequests();
 
@@ -48,31 +48,31 @@ export const outpaint = async (req: Request, res: Response, next: NextFunction) 
       {
         validateStatus: undefined,
         responseType: "arraybuffer",
-        headers: { 
-          Authorization: `Bearer sk-MYAPIKEY`, 
-          Accept: `image/${outputFormat}` 
+        headers: {
+          Authorization: `Bearer sk-MYAPIKEY`,
+          Accept: `image/${outputFormat}`
         }
       }
     );
 
-    if (response.status === StatusCodes.BAD_REQUEST){
-      return res.status(StatusCodes.BAD_REQUEST).json({message: 'Invalid input'});
+    if (response.status === StatusCodes.BAD_REQUEST) {
+      return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid input' });
     }
 
-    if (response.status=== StatusCodes.FORBIDDEN){
-      return res.status(StatusCodes.FORBIDDEN).json({message: 'Your request was flagged by content moderation system'});
+    if (response.status === StatusCodes.FORBIDDEN) {
+      return res.status(StatusCodes.FORBIDDEN).json({ message: 'Your request was flagged by content moderation system' });
     }
 
-    if (response.status === StatusCodes.REQUEST_TOO_LONG){
-      return res.status(StatusCodes.REQUEST_TOO_LONG).json({message: 'Image too large, Please try again with a smaller image'});
+    if (response.status === StatusCodes.REQUEST_TOO_LONG) {
+      return res.status(StatusCodes.REQUEST_TOO_LONG).json({ message: 'Image too large, Please try again with a smaller image' });
     }
 
-    if (response.status === StatusCodes.INTERNAL_SERVER_ERROR){
-      logger.error({message: 'Internal server error by stable diffusion', functionName: 'outpaint', obj: {response}});
-      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message: 'We are experiencing some issues. Please try again later'});
+    if (response.status === StatusCodes.INTERNAL_SERVER_ERROR) {
+      logger.error({ message: 'Internal server error by stable diffusion', functionName: 'outpaint', obj: { response } });
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'We are experiencing some issues. Please try again later' });
     }
 
-    res.status(StatusCodes.OK).json({ message: 'Outpainting image', image: response.data});
+    res.status(StatusCodes.OK).json({ message: 'Outpainting image', image: response.data });
   } catch (e) {
     handleError({
       error: e,

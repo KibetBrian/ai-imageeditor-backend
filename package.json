@@ -18,6 +18,7 @@
     "@paralleldrive/cuid2": "^2.2.2",
     "@prisma/client": "5.14.0",
     "@types/node": "^20.12.12",
+    "amqplib": "^0.10.4",
     "aws-sdk": "^2.1642.0",
     "axios": "^1.7.2",
     "cookie-parser": "^1.4.6",
@@ -37,6 +38,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.2.0",
+    "@types/amqplib": "^0.10.5",
     "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",

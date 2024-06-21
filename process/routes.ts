@@ -1,6 +1,6 @@
 import { NextFunction, Router, Request, Response } from "express"; // Added Response here
 import { generate } from "./generate";
-import { removeBackground } from "./background_remover/backgroundRemover";
+import { getProcessedImages, removeBackground } from "./background_remover/backgroundRemover";
 import multer, { FileFilterCallback, MulterError } from 'multer'; // Imported File and added it to the imports
 import { removeObject } from "./object_removal/object_removal";
 import { StatusCodes } from "http-status-codes";
@@ -49,6 +49,9 @@ const processRouter = Router();
 
 processRouter.post("/generate", generate);
 processRouter.post('/process/background-removal', verifyToken, fileUploadMiddleware, removeBackground);
+
+processRouter.post('/process/background-removal/processed', verifyToken, getProcessedImages);
+
 processRouter.post('/process/object-removal', fileUploadMiddleware, removeObject);
 
 export default processRouter;

@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from "express";
 import { generateCuid, handleError } from "../../utils/utils";
 import { generateImageValidationSchema } from "./validations";
 import { StatusCodes } from "http-status-codes";
-import { configs } from "../../configs/configs";
+import { thirdPartyApiConfigs } from "../../configs/configs";
 import fs from "fs/promises";
 import { fileURLToPath } from "url";
 import path from "path";

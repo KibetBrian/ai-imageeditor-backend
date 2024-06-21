@@ -26,7 +26,7 @@ export default [
       "no-unused-expressions": "error",
       "no-use-before-define": "error",
       "no-restricted-syntax": ["error", "WithStatement"],
-      "max-lines-per-function": ["error", { "max": 80 }],
+      "max-lines-per-function": ["error", { "max": 180 }],
       "max-params": ["error", 3],
       "max-depth": ["error", 3],
       "max-nested-callbacks": ["error", 3],

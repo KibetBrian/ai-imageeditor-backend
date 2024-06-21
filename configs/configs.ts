@@ -1,5 +1,5 @@
 export const thirdPartyApiConfigs = {
-  stableDiffusion: {
+  stabilityAi: {
     baseUrl: 'https://api.stability.ai/v2beta/stable-image/generate',
     models: [
       {
@@ -15,10 +15,10 @@ export const thirdPartyApiConfigs = {
         endpoint: 'https://api.stability.ai/v2beta/stable-image/generate/sd3'
       }
     ],
+    
     backgroundRemoval: {
       endpoint: 'https://api.stability.ai/v2beta/stable-image/edit/remove-background',
       credits: 2
-
     }
   }
 };

@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
-import { incrementSdRemainingRequests } from '../caching/redis';
+import { incrementSdRemainingRequests } from '../state/redis';
 import { handleError } from '../utils/utils';
 
-export const  updateSdRemainingRequests = async (req:Request, res:Response, next:NextFunction): Promise<void> => {
+export const updateSdRemainingRequests = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     await incrementSdRemainingRequests();
 
     next();
-  } catch (err){
+  } catch (err) {
     handleError({
       error: err,
       functionName: 'updateSdRemainingRequests',
