@@ -18,7 +18,7 @@ export const removeBackground = async (req: Request, res: Response, next: NextFu
 
     const promises = files.map(async (f, i) => {
       const imageId = imageIds[i];
-
+      
       const queuePayload = {
         imageId,
         imageBuffer: f.buffer,

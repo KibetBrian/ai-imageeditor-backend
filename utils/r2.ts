@@ -35,8 +35,6 @@ export const storeImage = async ({ bucketName, key, body }: StoreImage) => {
 
     await s3.send(command);
 
-    await s3.send(command);
-
     const getObjectCommand = new GetObjectCommand({
       Bucket: bucketName,
       Key: key
