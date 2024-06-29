@@ -7,9 +7,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model credit_purchases {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @unique
+  amount    Int
+  createdAt DateTime
+}
+
 model users {
   id      String @id @default(auto()) @map("_id") @db.ObjectId
-  userId  String @default(uuid()) @unique
+  userId  String @unique @default(uuid())
   name    String
   email   String @unique
   credits Int    @default(10)

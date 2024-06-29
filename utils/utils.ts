@@ -44,8 +44,16 @@ export const getStabilityFetchResponse = ({ response }: GetStabilityFetchAIRespo
   if (response.status===StatusCodes.BAD_REQUEST){
     return {
       status: StatusCodes.BAD_REQUEST,
-      data: response.data,
+      data: response.data.toString(),
       message: 'Bad Request'
+    };
+  }
+
+  if (response.status===StatusCodes.UNAUTHORIZED){
+    return {
+      status: StatusCodes.UNAUTHORIZED,
+      data: response.data.toString(),
+      message: 'Unauthorized'
     };
   }
 

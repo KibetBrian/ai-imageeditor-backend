@@ -6,6 +6,7 @@ import { incrementSARemainingRequests } from "../../state/redis";
 import { sendMessageToQueue } from "../../messaging/rabbitmq";
 import { getImageBackgroundRemovalState, setImageBackgroundRemovalState } from "../../state/backgroundRemoval";
 import { getProcessedImagesValidationSchema } from "./validations";
+import { BackgroundRemovalQueuePayload, ImageBuffer } from "../../messaging/consumers/background_removal/types";
 
 export const removeBackground = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -19,9 +20,10 @@ export const removeBackground = async (req: Request, res: Response, next: NextFu
     const promises = files.map(async (f, i) => {
       const imageId = imageIds[i];
       
-      const queuePayload = {
+      const queuePayload:BackgroundRemovalQueuePayload = {
         imageId,
-        imageBuffer: f.buffer,
+        userId: req.user.userId,
+        imageBuffer: f.buffer as unknown as ImageBuffer,
         imageName: f.originalname
       };
 
