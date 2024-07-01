@@ -2,21 +2,15 @@ import { redisClient } from "./redis";
 
 type Status = 'processing' | 'processed' | 'failed';
 
-interface State {
+interface BackgroundRemovalState {
   imageId: string;
-  status: Status;
-  base64Image?: string;
-  imageName: string;
-}
-
-interface BackgroundRemovedImage {
-  imageId: string;
-  imageBase64: string;
+  base64Image: string;
   imageName: string;
   status: Status;
+  message: string;
 }
 
-export const setImageBackgroundRemovalState = async (state: State): Promise<void> => {
+export const setImageBackgroundRemovalState = async (state: BackgroundRemovalState): Promise<void> => {
 
   const key = `backgroundRemoval${state.imageId}`;
 
@@ -32,7 +26,7 @@ export const removeImageBackgroundRemovalState = async ({ imageId }: { imageId: 
   await redisClient.del(key);
 };
 
-export const getImageBackgroundRemovalState = async ({ imageId }: { imageId: string }): Promise<BackgroundRemovedImage> => {
+export const getImageBackgroundRemovalState = async ({ imageId }: { imageId: string }): Promise<BackgroundRemovalState> => {
 
   const key = `backgroundRemoval${imageId}`;
 
@@ -41,13 +35,13 @@ export const getImageBackgroundRemovalState = async ({ imageId }: { imageId: str
   if (!state) {
     return {
       imageId,
-      imageBase64: '',
+      base64Image: '',
       imageName: '',
       status: 'failed'
-    } as BackgroundRemovedImage;
+    } as BackgroundRemovalState;
   }
 
-  const { status } = JSON.parse(state) as BackgroundRemovedImage;
+  const { status } = JSON.parse(state) as BackgroundRemovalState;
 
   if (status !== 'processing') {
     await removeImageBackgroundRemovalState({ imageId });

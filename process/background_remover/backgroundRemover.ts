@@ -20,7 +20,7 @@ export const removeBackground = async (req: Request, res: Response, next: NextFu
     const promises = files.map(async (f, i) => {
       const imageId = imageIds[i];
       
-      const queuePayload:BackgroundRemovalQueuePayload = {
+      const queuePayload: BackgroundRemovalQueuePayload = {
         imageId,
         userId: req.user.userId,
         imageBuffer: f.buffer as unknown as ImageBuffer,
@@ -29,7 +29,7 @@ export const removeBackground = async (req: Request, res: Response, next: NextFu
 
       return Promise.all([
         sendMessageToQueue({ 'queue': 'backgroundRemoval', payload: queuePayload }),
-        setImageBackgroundRemovalState({ imageId, status: 'processing', imageName: f.originalname})
+        setImageBackgroundRemovalState({ imageId, status: 'processing', base64Image: '', message: '', imageName: f.originalname })
       ]);
     });
 
