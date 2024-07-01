@@ -19,6 +19,10 @@ export const thirdPartyApiConfigs = {
     backgroundRemoval: {
       endpoint: 'https://api.stability.ai/v2beta/stable-image/edit/remove-background',
       credits: 2
+    },
+    objectErasal:{
+      endpoint: 'https://api.stability.ai/v2beta/stable-image/edit/erase',
+      credits: 3
     }
   }
 };

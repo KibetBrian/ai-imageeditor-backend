@@ -2,7 +2,7 @@ import { NextFunction, Router, Request, Response } from "express"; // Added Resp
 import { generate } from "./generate";
 import { getProcessedImages, removeBackground } from "./background_remover/backgroundRemover";
 import multer, { FileFilterCallback, MulterError } from 'multer'; // Imported File and added it to the imports
-import { removeObject } from "./object_removal/object_removal";
+import { removeObject } from "./object_erasal/object_removal";
 import { StatusCodes } from "http-status-codes";
 import path from 'path';
 import { verifyToken } from "../middleware/auth";
