@@ -1,25 +1,27 @@
 export const thirdPartyApiConfigs = {
   stabilityAi: {
-    baseUrl: 'https://api.stability.ai/v2beta/stable-image/generate',
-    models: [
-      {
-        name: 'ultra',
-        endpoint: 'https://api.stability.ai/v2beta/stable-image/generate/ultra'
-      },
-      {
-        name: 'core',
-        endpoint: 'https://api.stability.ai/v2beta/stable-image/generate/core'
-      },
-      {
-        name: 'sd3',
-        endpoint: 'https://api.stability.ai/v2beta/stable-image/generate/sd3'
+    imageGeneration:{
+      models:{
+        ultra:{
+          endpoint: 'https://api.stability.ai/v2beta/stable-image/generate/ultra',
+          credits: 8
+        },
+        core:{
+          endpoint: 'https://api.stability.ai/v2beta/stable-image/generate/core',
+          credits: 3
+        },
+        sd3:{
+          endpoint: 'https://api.stability.ai/v2beta/stable-image/generate/sd3',
+          credits: 6.5
+        }
       }
-    ],
+    },
     
     backgroundRemoval: {
       endpoint: 'https://api.stability.ai/v2beta/stable-image/edit/remove-background',
       credits: 2
     },
+
     objectErasal:{
       endpoint: 'https://api.stability.ai/v2beta/stable-image/edit/erase',
       credits: 3

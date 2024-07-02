@@ -53,7 +53,7 @@ export const getStabilityFetchResponse = ({ response }: GetStabilityFetchAIRespo
     return {
       status: StatusCodes.UNAUTHORIZED,
       data: response.data.toString(),
-      message: 'Unauthorized'
+      message: 'We are experiencing issues, try again later'
     };
   }
 

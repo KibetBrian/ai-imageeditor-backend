@@ -1,12 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { handleError } from '../../utils/utils';
+import { getStabilityFetchResponse, handleError } from '../../utils/utils';
 import axios from "axios";
 import FormData from "form-data";
 import logger from '../../utils/logger';
-import { makeBlackAndWhite } from './utils';
-import { ObjectRemovalApiResponseHeaders } from './types';
 import { incrementSARemainingRequests } from '../../state/redis';
+import { thirdPartyApiConfigs } from '../../configs/configs';
+import prisma from '../../prisma/client';
+import { makeBlackAndWhite } from './utils';
 
 export const removeObject = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -29,46 +30,55 @@ export const removeObject = async (req: Request, res: Response, next: NextFuncti
       return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid request' });
     }
 
-    const blackAndWhiteMask = await makeBlackAndWhite(mask.buffer);
+    const { credits, endpoint } = thirdPartyApiConfigs.stabilityAi.objectErasal;
 
-    const payload = {
-      image: image.buffer,
-      mask: blackAndWhiteMask,
-      // eslint-disable-next-line camelcase
-      output_format: outputFormat
-    };
+    const formData = new FormData();
 
-    const response = await axios.postForm(
-      `https://api.stability.ai/v2beta/stable-image/edit/erase`,
-      axios.toFormData(payload, new FormData()),
+    const maskBuffer= await makeBlackAndWhite(mask.buffer);
+
+    formData.append('image', image.buffer, {
+      contentType: 'image/png',
+      filename: image.originalname
+    });
+
+    formData.append('mask', maskBuffer, {
+      contentType: 'image/png',
+      filename: mask.originalname
+    });
+
+    formData.append('output_format', outputFormat);
+   
+    const objectErasalResponse = await axios.postForm(
+      endpoint,
+      formData,
       {
         validateStatus: undefined,
         responseType: "arraybuffer",
         headers: {
-          Authorization: `Bearer sk-MYAPIKEY`,
-          Accept: `image/{outputFormat}`
+          Authorization: `Bearer ${process.env.STABILITY_AI_API_KEY}`,
+          Accept: `image/*`
         }
       }
     );
 
-    const responseHeaders = response.headers as unknown as ObjectRemovalApiResponseHeaders;
+    const response = getStabilityFetchResponse({response: objectErasalResponse});
 
-    // TODO: change to correct
-    const base64Image = blackAndWhiteMask.toString('base64');
-
-    if (responseHeaders['finish-reason'] === 'CONTENT_FILTERED') {
-      return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Your request was flagged by content moderation system' });
+    if (response.status !== StatusCodes.OK) {
+      return res.status(response.status).json({ message: response.message});
     }
 
-    if (response.status === StatusCodes.INTERNAL_SERVER_ERROR) {
-      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'We are experiencing some issues. Please try again later' });
-    }
+    await prisma.users.update({
+      data:{
+        credits:{
+          decrement: credits
+        }
+      },
+      where:{
+        userId: req.user.userId
+      }
+    });
 
-    if (response.status === StatusCodes.REQUEST_TOO_LONG) {
-      return res.status(StatusCodes.REQUEST_TOO_LONG).json({ message: 'Image too large, Please try again with a smaller image' });
-    }
-
-    res.status(StatusCodes.OK).json({ message: 'Object removed successfully', image: base64Image });
+    res.status(StatusCodes.OK).json({ message: 'Object removed successfully', image: Buffer.from(image.buffer).toString('base64') });
   } catch (error) {
     handleError({
       error: error,
