@@ -10,42 +10,43 @@ interface BackgroundRemovalState {
   message: string;
 }
 
-export const setImageBackgroundRemovalState = async (state: BackgroundRemovalState): Promise<void> => {
+const BACKGROUND_REMOVAL_KEY_PREFIX = 'backgroundRemoval';
 
-  const key = `backgroundRemoval${state.imageId}`;
+const getBackgroundRemovalKey = (imageId: string): string => `${BACKGROUND_REMOVAL_KEY_PREFIX}:${imageId}`;
 
-  const stringifiedState = JSON.stringify(state);
-
-  await redisClient.set(key, stringifiedState);
-
+const DEFAULT_BACKGROUND_REMOVAL_STATE: Omit<BackgroundRemovalState, 'imageId'> = {
+  base64Image: '',
+  imageName: '',
+  status: 'failed',
+  message: 'No record found for this image'
 };
 
-export const removeImageBackgroundRemovalState = async ({ imageId }: { imageId: string }): Promise<void> => {
-  const key = `backgroundRemoval${imageId}`;
+export const setImageBackgroundRemovalState = async (state: BackgroundRemovalState): Promise<void> => {
+  const key = getBackgroundRemovalKey(state.imageId);
+
+  await redisClient.set(key, JSON.stringify(state));
+};
+
+export const removeImageBackgroundRemovalState = async (imageId: string): Promise<void> => {
+  const key = getBackgroundRemovalKey(imageId);
 
   await redisClient.del(key);
 };
 
-export const getImageBackgroundRemovalState = async ({ imageId }: { imageId: string }): Promise<BackgroundRemovalState> => {
+export const getImageBackgroundRemovalState = async (imageId: string): Promise<BackgroundRemovalState> => {
+  const key = getBackgroundRemovalKey(imageId);
+  
+  const serializedState = await redisClient.get(key);
 
-  const key = `backgroundRemoval${imageId}`;
-
-  const state = await redisClient.get(key);
-
-  if (!state) {
-    return {
-      imageId,
-      base64Image: '',
-      imageName: '',
-      status: 'failed'
-    } as BackgroundRemovalState;
+  if (!serializedState) {
+    return { imageId, ...DEFAULT_BACKGROUND_REMOVAL_STATE };
   }
 
-  const { status } = JSON.parse(state) as BackgroundRemovalState;
+  const state = JSON.parse(serializedState) as BackgroundRemovalState;
 
-  if (status !== 'processing') {
-    await removeImageBackgroundRemovalState({ imageId });
+  if (state.status !== 'processing') {
+    await removeImageBackgroundRemovalState(imageId);
   }
 
-  return JSON.parse(state);
+  return state;
 };
