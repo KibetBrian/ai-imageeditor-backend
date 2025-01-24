@@ -4,7 +4,7 @@ import { handleError } from '../utils/utils';
 
 export const updateSdRemainingRequests = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    await incrementSdRemainingRequests();
+    await incrementSdRemainingRequests(1);
 
     next();
   } catch (err) {
