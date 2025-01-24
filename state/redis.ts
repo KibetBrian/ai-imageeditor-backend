@@ -35,9 +35,11 @@ export const getSdRemainingRequests = async (): Promise<number> => {
   }
 };
 
-export const incrementSdRemainingRequests = async (number: number): Promise<void> => {
+export const incrementSdRemainingRequests = async (n: number | undefined | null): Promise<void> => {
   try {
-    const requests = await redisClient.incrBy(REDIS_CONFIG.KEYS.SD_REMAINING_REQUESTS, number);
+    const c = n || 1;
+
+    const requests = await redisClient.incrBy(REDIS_CONFIG.KEYS.SD_REMAINING_REQUESTS, c);
 
     if (requests >= REDIS_CONFIG.LIMITS.STABLE_DIFFUSION_RATE) {
       await Promise.all([
