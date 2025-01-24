@@ -2,18 +2,18 @@
 import { Request, Response, NextFunction } from "express";
 import { generateCuid, handleError } from "../../utils/utils";
 import { StatusCodes } from "http-status-codes";
-import { incrementSARemainingRequests } from "../../state/redis";
 import { sendMessageToQueue } from "../../messaging/rabbitmq";
 import { getImageBackgroundRemovalState, setImageBackgroundRemovalState } from "../../state/backgroundRemoval";
 import { getProcessedImagesValidationSchema } from "./validations";
 import { BackgroundRemovalQueuePayload, ImageBuffer } from "../../messaging/consumers/background_removal/types";
+import { incrementSdRemainingRequests } from "../../state/redis";
 
 export const removeBackground = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const files = req.files as Express.Multer.File[];
     if (!files || files.length === 0) return res.status(StatusCodes.BAD_REQUEST).json({ message: 'No files uploaded' });
 
-    await incrementSARemainingRequests(files.length);
+    await incrementSdRemainingRequests(files.length);
 
     const imageIds = files.map(() => generateCuid());
 
@@ -59,8 +59,8 @@ export const getProcessedImages = async (req: Request, res: Response, next: Next
 
     const { imageIds } = validationResults.data;
 
-    const promises = imageIds.map((imageId: string) => {
-      const imageState = getImageBackgroundRemovalState({ imageId });
+    const promises = imageIds.map( async (imageId: string) => {
+      const imageState = await getImageBackgroundRemovalState(imageId);
 
       return imageState;
     });
