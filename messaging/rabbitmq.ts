@@ -2,7 +2,7 @@ import * as ampq from 'amqplib';
 import { Queue, SendPayloadToQueue } from './types';
 import logger from '../utils/logger';
 import { backgroundRemoval } from './consumers/background_removal/backgroundRemoval';
-import { BackgroundRemovalPayload } from './consumers/background_removal/types';
+import { BackgroundRemovalQueuePayload } from './consumers/background_removal/types';
 
 const queues: Queue[] = ['backgroundRemoval'];
 
@@ -48,7 +48,7 @@ export const consumeFromQueue = async (queue: Queue) => {
         const messageObject = JSON.parse(messageString);
 
         if (queue === 'backgroundRemoval') {
-          await backgroundRemoval(messageObject as BackgroundRemovalPayload);
+          await backgroundRemoval(messageObject as BackgroundRemovalQueuePayload);
           
           channel.ack(message);
         }
