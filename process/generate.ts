@@ -3,9 +3,9 @@ import { Request, Response, NextFunction } from 'express';
 import axios, { AxiosError } from 'axios';
 import FormData from 'form-data';
 import { StatusCodes } from 'http-status-codes';
-import { thirdPartyEndpoints } from './constants';
 import logger from '../utils/logger';
 import { handleError } from '../utils/utils';
+import { thirdPartyApiConfigs } from '../configs/configs';
 
 interface GenerateResponse {
   message?: string;
@@ -69,7 +69,7 @@ const callStableDiffusionAPI = async (prompt: string): Promise<StableDiffusionRe
 
   try {
     const response = await axios.postForm(
-      thirdPartyEndpoints.sd3ImageGeneration,
+      thirdPartyApiConfigs.stabilityAi.imageGeneration.models.sd3.endpoint,
       axios.toFormData(formData, new FormData()),
       {
         validateStatus: undefined,
