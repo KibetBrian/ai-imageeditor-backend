@@ -7,6 +7,7 @@ import FormData from "form-data";
 import { outpaintingValidationSchema } from './validations';
 import { validateAspectRatio } from './utils';
 import logger from '../../utils/logger';
+import { thirdPartyApiConfigs } from '../../configs/configs';
 
 export const outpaint = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -18,7 +19,7 @@ export const outpaint = async (req: Request, res: Response, next: NextFunction) 
 
     const { down, left, outputFormat, right, up } = validationResults.data;
 
-    await incrementSdRemainingRequests();
+    await incrementSdRemainingRequests(1);
 
     const files = req.files as Express.Multer.File[];
 
@@ -43,13 +44,13 @@ export const outpaint = async (req: Request, res: Response, next: NextFunction) 
     };
 
     const response = await axios.postForm(
-      `https://api.stability.ai/v2beta/stable-image/edit/outpaint`,
+      thirdPartyApiConfigs.stabilityAi.outpainting.endpoint,
       axios.toFormData(payload, new FormData()),
       {
         validateStatus: undefined,
         responseType: "arraybuffer",
         headers: {
-          Authorization: `Bearer sk-MYAPIKEY`,
+          Authorization: `Bearer ${process.env.STABILITY_AI_API_KEY}`,
           Accept: `image/${outputFormat}`
         }
       }
