@@ -25,6 +25,10 @@ export const thirdPartyApiConfigs = {
     objectErasal:{
       endpoint: 'https://api.stability.ai/v2beta/stable-image/edit/erase',
       credits: 3
+    },
+    outpainting:{
+      endpoint: 'https://api.stability.ai/v2beta/stable-image/edit/outpaint',
+      credits: 1
     }
   }
 };
