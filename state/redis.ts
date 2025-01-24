@@ -1,29 +1,69 @@
-import { createClient } from 'redis';
+import { createClient, RedisClientType } from 'redis';
 
-export const redisClient = createClient({
+const REDIS_CONFIG = {
+  KEYS: {
+    SD_REMAINING_REQUESTS: 'sdRemainingRequests'
+  },
+  TIME: {
+    TEN_SECONDS_MS: 10000,
+    TEN_SECONDS: 10
+  },
+  LIMITS: {
+    STABLE_DIFFUSION_RATE: 150
+  }
+} as const;
+
+export const redisClient: RedisClientType = createClient({
   url: process.env.REDIS_URL
 });
 
-const stableDiffusionRateLimit = 150; // 150 requests per 10 seconds
-const key = 'sdRemainingRequests';
-const tenSecondsInMilliseconds = 10000;
-const tenSeconds = 10;
+redisClient.on('error', (error) => {
+  // eslint-disable-next-line no-console
+  console.error('Redis Client Error:', error);
+});
 
-export const getSdRemainingRequests= async ():Promise<number> => {
-  const res = await redisClient.get(key);
+export const getSdRemainingRequests = async (): Promise<number> => {
+  try {
+    const res = await redisClient.get(REDIS_CONFIG.KEYS.SD_REMAINING_REQUESTS);
+    
+    return res ? Number(res) : 0;
+  } catch (error) {
 
-  if (!res) return 0;
-
-  return Number(res);
-};
-
-export const incrementSARemainingRequests = async (number: number): Promise<void> => {
-  const requests = await redisClient.incrBy(key, number);
-
-  if (requests >=stableDiffusionRateLimit){
-    await new Promise((resolve) => setTimeout(resolve, tenSecondsInMilliseconds));
-    await redisClient.set(key, 0);
-    await redisClient.expire(key, tenSeconds);
+    // eslint-disable-next-line no-console
+    console.error('Error getting remaining requests:', error);
+    throw new Error('Failed to get remaining requests count');
   }
 };
 
+export const incrementSdRemainingRequests = async (number: number): Promise<void> => {
+  try {
+    const requests = await redisClient.incrBy(REDIS_CONFIG.KEYS.SD_REMAINING_REQUESTS, number);
+
+    if (requests >= REDIS_CONFIG.LIMITS.STABLE_DIFFUSION_RATE) {
+      await Promise.all([
+        new Promise((resolve) => setTimeout(resolve, REDIS_CONFIG.TIME.TEN_SECONDS_MS)),
+        redisClient.set(REDIS_CONFIG.KEYS.SD_REMAINING_REQUESTS, '0'),
+        redisClient.expire(
+          REDIS_CONFIG.KEYS.SD_REMAINING_REQUESTS,
+          REDIS_CONFIG.TIME.TEN_SECONDS
+        )
+      ]);
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Error incrementing remaining requests:', error);
+    throw new Error('Failed to increment remaining requests');
+  }
+};
+
+export const initializeRedis = async (): Promise<void> => {
+  try {
+    await redisClient.connect();
+    // eslint-disable-next-line no-console
+    console.log('Redis client connected successfully');
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to connect to Redis:', error);
+    throw error;
+  }
+};
