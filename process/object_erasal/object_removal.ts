@@ -4,14 +4,14 @@ import { getStabilityFetchResponse, handleError } from '../../utils/utils';
 import axios from "axios";
 import FormData from "form-data";
 import logger from '../../utils/logger';
-import { incrementSARemainingRequests } from '../../state/redis';
 import { thirdPartyApiConfigs } from '../../configs/configs';
 import prisma from '../../prisma/client';
 import { makeBlackAndWhite } from './utils';
+import { incrementSdRemainingRequests } from '../../state/redis';
 
 export const removeObject = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    await incrementSARemainingRequests(1);
+    await incrementSdRemainingRequests(1);
 
     const outputFormat = 'png';
     const files = req.files as Express.Multer.File[];
