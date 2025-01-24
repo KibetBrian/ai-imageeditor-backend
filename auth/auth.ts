@@ -22,7 +22,7 @@ export const syncAuth = async (req: Request, res: Response, next: NextFunction) 
       }
     });
 
-    res.status(StatusCodes.OK).json({ message: 'User created', user });
+    res.status(StatusCodes.OK).json({ message: 'User synced successfully', user });
   } catch (e) {
     handleError({
       error: e,
